@@ -2,5 +2,9 @@
     <string name="app_name">PicPay</string>
     <string name="title">Contatos</string>
     <string name="error">Ocorreu um erro. Tente novamente.</string>
+    <string name="layout_error_label">Ops...</string>
+    <string name="layout_error_retry">Tentar novamente</string>
+    <string name="layout_empty_description">No momento a lista de usuários ainda não possui usuários cadastrados!</string>
+    <string name="snack_bar_message">Você está sem conexão. A lista pode estar desatualizada!</string>
 
 </resources>

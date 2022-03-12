@@ -1,0 +1,21 @@
+plugins {
+    id 'java-library'
+    id 'kotlin'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+}
+
+dependencies {
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
+    api "junit:junit:$junit_version"
+    api "org.mockito:mockito-core:$mockito_version"
+    api "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockito_kotlin_version"
+    api "androidx.arch.core:core-testing:$core_testing_version"
+
+    api "androidx.test:runner:$test_runner_version"
+    api "androidx.test.espresso:espresso-core:$espresso_version"
+    api "androidx.test:core-ktx:$core_ktx_test_version"
+}
