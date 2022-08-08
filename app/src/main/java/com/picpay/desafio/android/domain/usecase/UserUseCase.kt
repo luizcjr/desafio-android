@@ -7,9 +7,12 @@ import kotlin.jvm.Throws
 
 interface UserUseCase {
     suspend operator fun invoke(): List<User>
+    suspend operator fun invoke(user: List<User>)
 }
 
 class UserUseCaseImpl(private val repository: UserRepository) : UserUseCase {
-    @Throws(RemoteException::class)
+
     override suspend fun invoke(): List<User> = repository.getUsers()
+
+    override suspend fun invoke(user: List<User>) = repository.insertUsers(user)
 }

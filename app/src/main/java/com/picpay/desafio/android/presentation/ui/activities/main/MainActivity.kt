@@ -1,15 +1,12 @@
 package com.picpay.desafio.android.presentation.ui.activities.main
 
 import android.os.Bundle
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.picpay.desafio.android.R
-import com.picpay.desafio.android.data.model.User
-import com.picpay.desafio.android.data.utils.ResultState
 import com.picpay.desafio.android.databinding.ActivityMainBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -40,25 +37,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchData() {
-        if (mViewModel.checkForInternet(this)) {
-            mViewModel.fetchUsers()
-            observeRemoteData()
-        } else {
-            mViewModel.fetchUsersLocal()
-            observeLocalData()
-        }
+        mViewModel.fetchUsers()
+        observeData()
     }
 
-    private fun observeRemoteData() {
+    private fun observeData() {
         mViewModel.users.observe(this, {
-            statesView(it)
+            mViewModel.present(it, this)
         })
-    }
-
-    private fun observeLocalData() {
-        showSnackBar()
-        mViewModel.usersLocal.observe(this, { userLocal ->
-            statesView(userLocal)
+        mViewModel.usersStatus.observe(this, {
+            binding.userListProgressBar.isVisible = it.progressBar
+            binding.groupContent.isVisible = it.groupContent
+            binding.includeLayoutError.errorView.isVisible = it.errorView
+            binding.includeLayoutEmpty.emptyView.isVisible = it.emptyView
+            if (it.snackBar) showSnackBar()
+            it.users?.let { users ->
+                mAdapter.submitList(users)
+            }
+            if (it.errorView) {
+                binding.includeLayoutError.btnRetry.setOnClickListener {
+                    fetchData()
+                }
+            }
         })
     }
 
@@ -71,60 +71,5 @@ class MainActivity : AppCompatActivity() {
             .setAction("Ok") {}
             .setActionTextColor(ContextCompat.getColor(this, R.color.colorAccent))
             .show()
-    }
-
-    private fun statesView(state: ResultState<List<User>>) {
-        when (state) {
-            ResultState.Loading -> {
-                setComponentVisibility(
-                    progressBar = true,
-                    group = false,
-                    errorView = false,
-                    emptyView = false
-                )
-            }
-            is ResultState.Error -> {
-                setComponentVisibility(
-                    progressBar = false,
-                    group = false,
-                    errorView = true,
-                    emptyView = false
-                )
-
-                binding.includeLayoutError.btnRetry.setOnClickListener {
-                    fetchData()
-                }
-            }
-            is ResultState.Success -> {
-                setComponentVisibility(
-                    progressBar = false,
-                    group = true,
-                    errorView = false,
-                    emptyView = false
-                )
-
-                mAdapter.submitList(state.result)
-            }
-            is ResultState.Empty -> {
-                setComponentVisibility(
-                    progressBar = false,
-                    group = false,
-                    errorView = false,
-                    emptyView = true
-                )
-            }
-        }
-    }
-
-    private fun setComponentVisibility(
-        progressBar: Boolean,
-        group: Boolean,
-        errorView: Boolean,
-        emptyView: Boolean
-    ) {
-        binding.userListProgressBar.isVisible = progressBar
-        binding.groupContent.isVisible = group
-        binding.includeLayoutError.errorView.isVisible = errorView
-        binding.includeLayoutEmpty.emptyView.isVisible = emptyView
     }
 }

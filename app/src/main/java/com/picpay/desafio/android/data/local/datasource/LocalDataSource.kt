@@ -6,5 +6,5 @@ import com.picpay.desafio.android.data.local.entity.UsersEntity
 class LocalDataSource(private val dao: UsersDao) {
 
     suspend fun insertUsers(usersEntity: List<UsersEntity>) = dao.insertUsers(usersEntity)
-    fun readUsers() = dao.readUsers()
+    suspend fun readUsers() = dao.readUsers()
 }

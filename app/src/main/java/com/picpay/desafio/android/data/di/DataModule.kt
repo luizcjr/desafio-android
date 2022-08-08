@@ -1,16 +1,14 @@
 package com.picpay.desafio.android.data.di
 
 import android.app.Application
-import android.content.Context
-import androidx.datastore.preferences.SharedPreferencesMigration
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.localebro.okhttpprofiler.OkHttpProfilerInterceptor
 import com.picpay.desafio.android.BuildConfig
 import com.picpay.desafio.android.data.local.dao.UsersDao
 import com.picpay.desafio.android.data.local.database.UsersDatabase
 import com.picpay.desafio.android.data.local.datasource.LocalDataSource
-import com.picpay.desafio.android.data.repository.*
+import com.picpay.desafio.android.data.repository.UserRepository
+import com.picpay.desafio.android.data.repository.UserRepositoryImpl
 import com.picpay.desafio.android.data.service.PicPayService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -53,8 +51,7 @@ object DataModule {
 
     private fun repositoryModule(): Module {
         return module {
-            single<UserRepository> { UserRepositoryImpl(get()) }
-            single<UserLocalRepository> { UserLocalRepositoryImpl(get()) }
+            single<UserRepository> { UserRepositoryImpl(get(), get(), androidContext()) }
         }
     }
 

@@ -7,14 +7,11 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import com.picpay.desafio.android.data.model.User
 import com.picpay.desafio.android.data.model.UserFactory
-import com.picpay.desafio.android.data.utils.RemoteException
 import com.picpay.desafio.android.data.utils.ResultState
 import com.picpay.desafio.android.domain.usecase.UserUseCase
-import com.picpay.desafio.android.domain.usecase.UsersLocalUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runBlockingTest
-import okhttp3.internal.notify
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -37,13 +34,7 @@ class MainViewModelTest {
     lateinit var userUseCase: UserUseCase
 
     @Mock
-    lateinit var usersLocalUseCase: UsersLocalUseCase
-
-    @Mock
     private lateinit var usersLiveDataObserver: Observer<ResultState<List<User>>>
-
-    @Mock
-    private lateinit var usersLocalLiveDataObserver: Observer<ResultState<List<User>>>
 
     private lateinit var mainViewModel: MainViewModel
 
@@ -58,9 +49,8 @@ class MainViewModelTest {
     @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
-        mainViewModel = MainViewModel(userUseCase, usersLocalUseCase)
+        mainViewModel = MainViewModel(userUseCase)
         mainViewModel.users.observeForever(usersLiveDataObserver)
-        mainViewModel.usersLocal.observeForever(usersLocalLiveDataObserver)
     }
 
     @ExperimentalCoroutinesApi
@@ -96,40 +86,5 @@ class MainViewModelTest {
             verify(usersLiveDataObserver).onChanged(ResultState.Loading)
             delay(3000)
             verify(usersLiveDataObserver).onChanged(ResultState.Empty)
-        }
-
-    @ExperimentalCoroutinesApi
-    @Test
-    fun `should validate the ResultState is equals Success in onChanged when calling fetchUsersLocal`() =
-        runBlockingTest {
-            whenever(usersLocalUseCase()).thenReturn(fakeUsersList)
-            mainViewModel.fetchUsersLocal()
-
-            verify(usersLocalLiveDataObserver).onChanged(ResultState.Loading)
-            delay(3000)
-            val result = ResultState.Success(fakeUsersList)
-            verify(usersLocalLiveDataObserver).onChanged(result)
-        }
-
-    @ExperimentalCoroutinesApi
-    @Test
-    fun `should validate the ResultState is equals Loading in onChanged when calling fetchUsersLocal`() =
-        runBlockingTest {
-            whenever(usersLocalUseCase()).thenReturn(fakeUsersList)
-            mainViewModel.fetchUsersLocal()
-
-            verify(usersLocalLiveDataObserver).onChanged(ResultState.Loading)
-        }
-
-    @ExperimentalCoroutinesApi
-    @Test
-    fun `should validate the ResultState is equals Empty in onChanged when calling fetchUsersLocal`() =
-        runBlockingTest {
-            whenever(usersLocalUseCase()).thenReturn(emptyList())
-            mainViewModel.fetchUsersLocal()
-
-            verify(usersLocalLiveDataObserver).onChanged(ResultState.Loading)
-            delay(3000)
-            verify(usersLocalLiveDataObserver).onChanged(ResultState.Empty)
         }
 }

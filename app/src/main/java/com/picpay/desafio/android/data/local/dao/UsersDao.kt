@@ -12,5 +12,5 @@ interface UsersDao {
     suspend fun insertUsers(users: List<UsersEntity>)
 
     @Query("SELECT * FROM users_table ORDER BY id ASC")
-    fun readUsers(): List<UsersEntity>
+    suspend fun readUsers(): List<UsersEntity>
 }
